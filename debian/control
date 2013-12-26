@@ -1,0 +1,19 @@
+Source: tint2-panel-config
+Section: utils
+Priority: optional
+Maintainer: Eugenio Paolantonio (g7) <me@medesimo.eu>
+Build-Depends: python (>= 2.6.6-3), python-all, debhelper (>= 8.0.0)
+X-Python-Version: >= 2.6
+Standards-Version: 3.9.5
+Homepage: http://github.com/semplice/tint2-panel-config
+Vcs-Git: git://github.com/semplice/tint2-panel-config.git
+Vcs-Browser: https://github.com/semplice/tint2-panel-config
+
+Package: tint2-panel-config
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, python-quickstart, python-gi,
+ gir1.2-gtk-3.0, gir1.2-gmenu-3.0, python-xdg
+Description: Simple GUI to tweak the panel
+ tint2-panel-config is a simple GUI to tweak Semplice's panel.
+ It requires the semplice-patched tint2, so it is only really relevant
+ in a Semplice system.

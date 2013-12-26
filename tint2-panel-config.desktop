@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=Panel
+Name[it_IT]=Pannello
+Categories=Settings;
+NotShowIn=Openbox;
+Exec=/usr/bin/tint2-panel-config
+Icon=gnome-panel-launcher
