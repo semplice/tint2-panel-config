@@ -199,6 +199,9 @@ class GUI:
 		settings = Gtk.Settings.get_default()
 		icon_theme = settings.get_property("gtk-icon-theme-name")
 		
+		if not os.path.exists(os.path.dirname(CONFIG)):
+			os.makedirs(os.path.dirname(CONFIG))
+		
 		with open(CONFIG, "w") as f:
 			if self.objects["ampm_enabled"].get_active():
 				f.write("time1_format = %I:%M %p\n")
@@ -267,38 +270,39 @@ class GUI:
 		self.objects["enabled_treeview"].append_column(column)
 
 		# Open config
-		with open(CONFIG) as f:
-			for line in f.readlines():
-				line = line.split("=")
-				if line[0].startswith("launcher_item_app"):
-					# A launcher!
-					path = line[1].strip("\n").replace(" /","/",1)
-					desktopentry = xdg.DesktopEntry.DesktopEntry(path)
-					iconpath = desktopentry.getIcon()
-					if iconpath and iconpath.startswith("/"):
-						icon = Gio.Icon.new_for_string(iconpath)
-					elif iconpath:
-						icon = Gio.ThemedIcon()
-						icon.append_name(iconpath.replace(".png",""))
-					else:
-						icon = None
-					self.enabled_model.append((desktopentry.getName(), path, icon))
-				elif line[0].startswith("panel_items"):
-					# Is the launcher enabled or not?
-					if "L" in line[1]:
-						# YES!
-						self.objects["enabled_checkbox"].set_active(True)
-					else:
-						# No :/
-						GObject.idle_add(self.objects["enabled_box"].set_sensitive, False)
-				elif line[0].startswith("time1_format"):
-					# AM/PM?
-					if "%p" in line[1]:
-						# Yes!
-						self.objects["ampm_enabled"].set_active(True)
-					else:
-						# No
-						self.objects["ampm_enabled"].set_active(False)
+		if os.path.exists(CONFIG):
+			with open(CONFIG) as f:
+				for line in f.readlines():
+					line = line.split("=")
+					if line[0].startswith("launcher_item_app"):
+						# A launcher!
+						path = line[1].strip("\n").replace(" /","/",1)
+						desktopentry = xdg.DesktopEntry.DesktopEntry(path)
+						iconpath = desktopentry.getIcon()
+						if iconpath and iconpath.startswith("/"):
+							icon = Gio.Icon.new_for_string(iconpath)
+						elif iconpath:
+							icon = Gio.ThemedIcon()
+							icon.append_name(iconpath.replace(".png",""))
+						else:
+							icon = None
+						self.enabled_model.append((desktopentry.getName(), path, icon))
+					elif line[0].startswith("panel_items"):
+						# Is the launcher enabled or not?
+						if "L" in line[1]:
+							# YES!
+							self.objects["enabled_checkbox"].set_active(True)
+						else:
+							# No :/
+							GObject.idle_add(self.objects["enabled_box"].set_sensitive, False)
+					elif line[0].startswith("time1_format"):
+						# AM/PM?
+						if "%p" in line[1]:
+							# Yes!
+							self.objects["ampm_enabled"].set_active(True)
+						else:
+							# No
+							self.objects["ampm_enabled"].set_active(False)
 
 		# First start, disable remove button.
 		if len(self.enabled_model) == 0: GObject.idle_add(self.objects["remove_button"].set_sensitive, False)
