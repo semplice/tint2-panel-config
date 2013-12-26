@@ -34,6 +34,23 @@ if not os.path.exists(GLADEFILE):
 	# Fallback to /usr/share/tint2-panel-config
 	GLADEFILE = "/usr/share/tint2-panel-config/tint2-panel-config.glade"
 
+class DirectoryIterate:
+	def __init__(self, obj):
+		self.obj = obj.iter()
+	
+	def __iter__(self):
+		return self
+	
+	def next(self):
+		nxt = self.obj.next()
+		
+		if nxt == GMenu.TreeItemType.INVALID:
+			raise StopIteration
+		elif nxt == GMenu.TreeItemType.DIRECTORY:
+			return self.obj.get_directory(), GMenu.TreeItemType.DIRECTORY
+		elif nxt == GMenu.TreeItemType.ENTRY:
+			return self.obj.get_entry(), GMenu.TreeItemType.ENTRY
+
 @quickstart.builder.from_file(GLADEFILE)
 class GUI:
 	
@@ -64,28 +81,25 @@ class GUI:
 	
 	def menu_iterate(self, directory, menu_iter=None, create_menu_iter=False, skip=None):
 		""" Iterates through the menu entries and adds them to the launcher_add_treeview. """
-		
+
 		if not directory: return
 		if not skip: skip = ()
-		directory_iter = directory.iter()
-		_next = directory_iter.next()
-
+		
 		if create_menu_iter:
 			menu_iter = self.launcher_add_model.append(None, (directory.get_name(), None, directory.get_icon()))
+		
+		for child, typ in DirectoryIterate(directory):
+			if typ == GMenu.TreeItemType.DIRECTORY:
+				# Directory
 
-		while _next != GMenu.TreeItemType.INVALID:
-			_current = _next
-			_next = directory_iter.next()
-			
-			if _current == GMenu.TreeItemType.DIRECTORY:
-				dire = directory_iter.get_directory()
-				if not dire or dire.get_menu_id() in skip:
+				if not child or child.get_menu_id() in skip:
 					continue
-				
-				_menu_iter = self.launcher_add_model.append(menu_iter, (dire.get_name(), None, dire.get_icon()))
-				self.menu_iterate(directory_iter.get_directory(), _menu_iter, skip=skip)
-			elif _current == GMenu.TreeItemType.ENTRY:
-				child = directory_iter.get_entry()
+
+				_menu_iter = self.launcher_add_model.append(menu_iter, (child.get_name(), None, child.get_icon()))
+				self.menu_iterate(child, _menu_iter, skip=skip)
+			elif typ == GMenu.TreeItemType.ENTRY:
+				# Entry
+
 				info = child.get_app_info()
 				#print info.get_icon()
 				
@@ -97,7 +111,6 @@ class GUI:
 						info.get_icon()
 					)
 				)
-				#print child.get_app_info().get_name(), child.get_desktop_file_path()
 
 	def on_enabled_treeview_cursor_changed(self, treeview):
 		""" Fired when the user changed something on the enabled_treeview. """
@@ -123,7 +136,7 @@ class GUI:
 	def build_application_list(self):
 		""" Builds the application list. """
 		
-		self.tree = GObject.new(GMenu.Tree, menu_basename="semplice-applications.menu",) #flags=GMenu.TreeFlags.SORT_DISPLAY_NAME)
+		self.tree = GMenu.Tree.new("semplice-applications.menu", GMenu.TreeFlags.SORT_DISPLAY_NAME)
 		self.tree.load_sync()
 				
 		# Create store
@@ -147,7 +160,7 @@ class GUI:
 		# Append
 		self.objects["launcher_add_treeview"].append_column(column)		
 		
-		GObject.idle_add(self.menu_iterate, self.tree.get_root_directory(), None, None, ("Preferences", "Administration"))		
+		GObject.idle_add(self.menu_iterate, self.tree.get_root_directory(), None, False, ("Preferences", "Administration"))		
 		GObject.idle_add(self.menu_iterate, self.tree.get_directory_from_path("/System/Preferences"), None, True)
 		GObject.idle_add(self.menu_iterate, self.tree.get_directory_from_path("/System/Administration"), None, True)
 		
@@ -161,7 +174,7 @@ class GUI:
 		
 		#self.objects["add_launcher"].show_all()
 		
-		if not self.tree: self.build_application_list()
+		if not self.tree: GObject.idle_add(self.build_application_list)
 		
 		GObject.idle_add(self.objects["add_launcher"].show_all)
 	
