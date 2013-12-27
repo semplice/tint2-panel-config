@@ -1,3 +1,9 @@
+tint2-panel-config (1.0.3) unstable; urgency=low
+
+  * Minor fixes.
+
+ -- Eugenio Paolantonio (g7) <me@medesimo.eu>  Fri, 27 Dec 2013 01:03:44 +0100
+
 tint2-panel-config (1.0.2) unstable; urgency=low
 
   * Fixed 'Add Launcher' window.
