@@ -168,15 +168,20 @@ class GUI:
 		
 		# First start, disable OK button.
 		GObject.idle_add(self.objects["launcher_ok_button"].set_sensitive, False)
-	
+
+		GObject.idle_add(self.objects["add_launcher"].show_all)
+
+
 	def on_add_button_clicked(self, button):
 		""" Fired when the Add launcher button has been clicked. """
 		
-		#self.objects["add_launcher"].show_all()
+		GObject.idle_add(self.objects["main"].set_sensitive, False)
 		
-		if not self.tree: GObject.idle_add(self.build_application_list)
+		if not self.tree:
+			GObject.idle_add(self.build_application_list)
+		else:
+			GObject.idle_add(self.objects["add_launcher"].show_all)
 		
-		GObject.idle_add(self.objects["add_launcher"].show_all)
 	
 	def on_remove_button_clicked(self, button):
 		""" Fired when the Remove launcher button has been clicked. """
@@ -200,11 +205,15 @@ class GUI:
 		model, treeiter = selection.get_selected()
 		
 		self.enabled_model.append((model[treeiter][0], model[treeiter][1], model[treeiter][2]))
+
+		GObject.idle_add(self.objects["main"].set_sensitive, True)
 	
 	def on_launcher_cancel_button_clicked(self, button):
 		""" Fired when the Cancel button in the add_launcher window has been clicked. """
 		
 		self.objects["add_launcher"].hide()
+
+		GObject.idle_add(self.objects["main"].set_sensitive, True)
 	
 	def on_close_button_clicked(self, button):
 		""" Fired when the close button has been clicked. """
