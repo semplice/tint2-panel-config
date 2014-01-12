@@ -325,6 +325,10 @@ class GUI:
 						else:
 							# No
 							self.objects["ampm_enabled"].set_active(False)
+		else:
+			# Ensure the enabled_checkbox is not active.
+			self.objects["enabled_checkbox"].set_active(False)
+			self.objects["add_button"].set_sensitive(False)
 
 		# First start, disable remove button.
 		if len(self.enabled_model) == 0: GObject.idle_add(self.objects["remove_button"].set_sensitive, False)
