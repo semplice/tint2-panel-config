@@ -12,7 +12,7 @@ Vcs-Browser: https://github.com/semplice/tint2-panel-config
 Package: tint2-panel-config
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, python-quickstart, python-gi,
- gir1.2-gtk-3.0, gir1.2-gmenu-3.0, python-xdg
+ gir1.2-gtk-3.0, gir1.2-gmenu-3.0, python-xdg, semplice-menu
 Description: Simple GUI to tweak the panel
  tint2-panel-config is a simple GUI to tweak Semplice's panel.
  It requires the semplice-patched tint2, so it is only really relevant
