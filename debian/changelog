@@ -1,3 +1,9 @@
+tint2-panel-config (1.0.5) unstable; urgency=low
+
+  * Make sure the add_button is sensitive when toggling the enabled checkbox.
+
+ -- Eugenio Paolantonio (g7) <me@medesimo.eu>  Tue, 14 Jan 2014 17:47:24 +0100
+
 tint2-panel-config (1.0.4) unstable; urgency=low
 
   * debian/control: depend on semplice-menu.
