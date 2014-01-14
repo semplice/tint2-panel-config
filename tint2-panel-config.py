@@ -263,6 +263,7 @@ class GUI:
 		
 		if checkbox.get_active():
 			GObject.idle_add(self.objects["enabled_box"].set_sensitive, True)
+			GObject.idle_add(self.objects["add_button"].set_sensitive, True)
 		else:
 			GObject.idle_add(self.objects["enabled_box"].set_sensitive, False)
 	
