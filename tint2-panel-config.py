@@ -228,9 +228,9 @@ class GUI:
 			if self.objects["ampm_enabled"].get_active():
 				f.write("time1_format = %I:%M %p\n")
 			if self.objects["enabled_checkbox"].get_active():
-				f.write("panel_items = LTSBC\n")
+				f.write("panel_items = LTSC\n")
 			else:
-				f.write("panel_items = TSBC\n")
+				f.write("panel_items = TSC\n")
 			f.write("launcher_icon_theme = %s\n" % icon_theme)
 			for treeiter in self.enabled_model:
 				f.write("launcher_item_app = %s\n" % treeiter[1])				
