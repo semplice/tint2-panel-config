@@ -65,6 +65,7 @@ class GUI:
 		),
 		"toggled" : (
 			"enabled_checkbox",
+			"Hide_checkbox"
 		),
 		"clicked" : (
 			"add_button",
@@ -225,6 +226,8 @@ class GUI:
 			os.makedirs(os.path.dirname(CONFIG))
 		
 		with open(CONFIG, "w") as f:
+			if self.objects["Hide_checkbox"].get_active():
+				f.write("autohide = 1\n")
 			if self.objects["ampm_enabled"].get_active():
 				f.write("time1_format = %I:%M %p\n")
 			if self.objects["enabled_checkbox"].get_active():
@@ -266,6 +269,11 @@ class GUI:
 			GObject.idle_add(self.objects["add_button"].set_sensitive, True)
 		else:
 			GObject.idle_add(self.objects["enabled_box"].set_sensitive, False)
+
+	def on_Hide_checkbox_toggled(self, checkbox):
+		""" Fired when the hide checkbox has been toggled. """
+		
+
 	
 	@quickstart.threads.thread
 	def initialize(self):
@@ -326,6 +334,15 @@ class GUI:
 						else:
 							# No
 							self.objects["ampm_enabled"].set_active(False)
+					elif line[0].startswith("autohide"):
+						# Autohide?
+						if "1" in line[1]:
+							# Yes
+							self.objects["Hide_checkbox"].set_active(True)
+						else:
+							# No
+							self.objects["Hide_checkbox"].set_active(False)
+
 		else:
 			# Ensure the enabled_checkbox is not active.
 			self.objects["enabled_checkbox"].set_active(False)
