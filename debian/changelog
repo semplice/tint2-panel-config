@@ -1,10 +1,8 @@
 tint2-panel-config (1.0.7) unstable; urgency=medium
 
-  [ GsCRuL3Z ]
   * Added panel autohide
-  [ Giuseppe Corti ]
 
- -- Giuseppe Corti <gsc@localhost>  Sun, 02 Feb 2014 19:56:35 +0100
+ -- Giuseppe Corti <giuseppe@infiniteloop.pro>  Sun, 02 Feb 2014 19:56:35 +0100
 
 tint2-panel-config (1.0.6) unstable; urgency=low
 
