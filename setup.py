@@ -23,7 +23,7 @@
 from distutils.core import setup
 
 setup(name='tint2-panel-config',
-	version='1.0.7',
+	version='1.0.8',
 	description='Simple GUI to tweak the panel',
 	author='Eugenio Paolantonio',
 	author_email='me@medesimo.eu',
