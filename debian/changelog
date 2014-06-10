@@ -1,3 +1,9 @@
+tint2-panel-config (1.0.8) unstable; urgency=medium
+
+  * Implemented support for the vertical panel position.
+
+ -- Eugenio Paolantonio (g7) <me@medesimo.eu>  Tue, 10 Jun 2014 13:31:09 +0200
+
 tint2-panel-config (1.0.7) unstable; urgency=medium
 
   [ GsCRuL3Z ]
