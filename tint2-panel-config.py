@@ -29,6 +29,12 @@ tr = quickstart.translations.Translation("tint2-panel-config")
 tr.install()
 tr.bind_also_locale()
 
+position_dict = {
+	"top" : 0,
+	"center" : 1,
+	"bottom" : 2
+}
+
 GLADEFILE = "./tint2-panel-config.glade"
 if not os.path.exists(GLADEFILE):
 	# Fallback to /usr/share/tint2-panel-config
@@ -226,15 +232,24 @@ class GUI:
 			os.makedirs(os.path.dirname(CONFIG))
 		
 		with open(CONFIG, "w") as f:
+			if self.objects["position_combo"].get_active() != position_dict["bottom"]:
+				# Panel position. If it is Bottom do not save it.
+				# This avoids messing up with the panel position for those
+				# who already modified it in the *primary* config.
+				f.write("panel_position = %s left horizontal\n" % self.objects["combostore"][self.objects["position_combo"].get_active_iter()][1])
 			if self.objects["Hide_checkbox"].get_active():
 				f.write("autohide = 1\n")
+				
 			if self.objects["ampm_enabled"].get_active():
 				f.write("time1_format = %I:%M %p\n")
+				
 			if self.objects["enabled_checkbox"].get_active():
 				f.write("panel_items = LTSC\n")
 			else:
 				f.write("panel_items = TSC\n")
+				
 			f.write("launcher_icon_theme = %s\n" % icon_theme)
+			
 			for treeiter in self.enabled_model:
 				f.write("launcher_item_app = %s\n" % treeiter[1])				
 		
@@ -300,48 +315,65 @@ class GUI:
 		# Append
 		self.objects["enabled_treeview"].append_column(column)
 
+		# Position combo: create renderer
+		cellrenderer = Gtk.CellRendererText()
+		self.objects["position_combo"].pack_start(cellrenderer, True)
+		self.objects["position_combo"].add_attribute(cellrenderer, "text", 0)
+
+		# Default position is "Bottom" (will be overriden later if we need to)
+		self.objects["position_combo"].set_active(position_dict["bottom"])
+
 		# Open config
 		if os.path.exists(CONFIG):
 			with open(CONFIG) as f:
 				for line in f.readlines():
-					line = line.split("=")
-					if line[0].startswith("launcher_item_app"):
-						# A launcher!
-						path = line[1].strip("\n").replace(" /","/",1)
-						desktopentry = xdg.DesktopEntry.DesktopEntry(path)
-						iconpath = desktopentry.getIcon()
-						if iconpath and iconpath.startswith("/"):
-							icon = Gio.Icon.new_for_string(iconpath)
-						elif iconpath:
-							icon = Gio.ThemedIcon()
-							icon.append_name(iconpath.replace(".png",""))
-						else:
-							icon = None
-						self.enabled_model.append((desktopentry.getName(), path, icon))
-					elif line[0].startswith("panel_items"):
-						# Is the launcher enabled or not?
-						if "L" in line[1]:
-							# YES!
-							self.objects["enabled_checkbox"].set_active(True)
-						else:
-							# No :/
-							GObject.idle_add(self.objects["enabled_box"].set_sensitive, False)
-					elif line[0].startswith("time1_format"):
-						# AM/PM?
-						if "%p" in line[1]:
-							# Yes!
-							self.objects["ampm_enabled"].set_active(True)
-						else:
-							# No
-							self.objects["ampm_enabled"].set_active(False)
-					elif line[0].startswith("autohide"):
-						# Autohide?
-						if "1" in line[1]:
-							# Yes
-							self.objects["Hide_checkbox"].set_active(True)
-						else:
-							# No
-							self.objects["Hide_checkbox"].set_active(False)
+					try:
+						line = line.split("=")
+						if line[0].startswith("launcher_item_app"):
+							# A launcher!
+							path = line[1].strip("\n").replace(" /","/",1)
+							desktopentry = xdg.DesktopEntry.DesktopEntry(path)
+							iconpath = desktopentry.getIcon()
+							if iconpath and iconpath.startswith("/"):
+								icon = Gio.Icon.new_for_string(iconpath)
+							elif iconpath:
+								icon = Gio.ThemedIcon()
+								icon.append_name(iconpath.replace(".png",""))
+							else:
+								icon = None
+							self.enabled_model.append((desktopentry.getName(), path, icon))
+						elif line[0].startswith("panel_items"):
+							# Is the launcher enabled or not?
+							if "L" in line[1]:
+								# YES!
+								self.objects["enabled_checkbox"].set_active(True)
+							else:
+								# No :/
+								GObject.idle_add(self.objects["enabled_box"].set_sensitive, False)
+						elif line[0].startswith("time1_format"):
+							# AM/PM?
+							if "%p" in line[1]:
+								# Yes!
+								self.objects["ampm_enabled"].set_active(True)
+							else:
+								# No
+								self.objects["ampm_enabled"].set_active(False)
+						elif line[0].startswith("autohide"):
+							# Autohide?
+							if "1" in line[1]:
+								# Yes
+								self.objects["Hide_checkbox"].set_active(True)
+							else:
+								# No
+								self.objects["Hide_checkbox"].set_active(False)
+						elif line[0].startswith("panel_position"):
+							# Position
+							splt = line[1].strip("\n").split(" ")
+							while splt.count(""):
+								splt.remove("")
+							self.objects["position_combo"].set_active(position_dict[splt[0]])
+					except Exception:
+						print("Error while loading configuration.")
 
 		else:
 			# Ensure the enabled_checkbox is not active.
